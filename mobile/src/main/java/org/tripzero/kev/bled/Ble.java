@@ -45,9 +45,14 @@ public class Ble {
 
     public class Device {
 
-        public String name;
+        public String name() {
+            return bleDevice.getName();
+        }
 
-        public String address;
+        public String address() {
+            return bleDevice.getAddress();
+        }
+
         Service service;
         public BleDeviceListener listener;
         private BluetoothGattCharacteristic rx = null;
