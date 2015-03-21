@@ -2,7 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Bled.iml" filepath="$PROJECT_DIR$/Bled.iml" />
+      <module fileurl="file://$PROJECT_DIR$/bled-android.iml" filepath="$PROJECT_DIR$/bled-android.iml" />
+      <module fileurl="file://$PROJECT_DIR$/mobile/libraries/fancybuttons_library/fancybuttons_library.iml" filepath="$PROJECT_DIR$/mobile/libraries/fancybuttons_library/fancybuttons_library.iml" />
+      <module fileurl="file://$PROJECT_DIR$/mobile/libraries/libraries.iml" filepath="$PROJECT_DIR$/mobile/libraries/libraries.iml" />
       <module fileurl="file://$PROJECT_DIR$/mobile/mobile.iml" filepath="$PROJECT_DIR$/mobile/mobile.iml" />
       <module fileurl="file://$PROJECT_DIR$/tv/tv.iml" filepath="$PROJECT_DIR$/tv/tv.iml" />
       <module fileurl="file://$PROJECT_DIR$/wear/wear.iml" filepath="$PROJECT_DIR$/wear/wear.iml" />

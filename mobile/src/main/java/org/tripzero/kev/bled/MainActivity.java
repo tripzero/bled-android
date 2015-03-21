@@ -1,27 +1,108 @@
 package org.tripzero.kev.bled;
 
-import android.support.v7.app.ActionBarActivity;
+import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+
+import com.gc.materialdesign.widgets.ColorSelector;
+import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
+
+import org.tripzero.kev.bled.adapters.LEDAdapter;
+import org.tripzero.kev.bled.utils.BaseActivity;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class MainActivity extends ActionBarActivity implements BleListener {
+public class MainActivity extends BaseActivity implements ColorSelector.OnColorSelectedListener,BleListener,LEDAdapter.OnFeedItemClickListener {
 
     private Ble ble;
-
+    public int backgroundColor = Color.parseColor("#039BE5");
     private List<Ble.Device> devices = new ArrayList<>();
+    LEDAdapter mAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
+    private RecyclerView mRecyclerView;
+    private List<ParseObject> mItems;
+    private boolean pendingIntroAnimation;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        ble = new Ble(getApplicationContext(), this);
-        ble.AddService("5faaf494-d4c6-483e-b592-d1a6ffd436c9", "5faaf495-d4c6-483e-b592-d1a6ffd436c9", "5faaf496-d4c6-483e-b592-d1a6ffd436c9");
-        ble.scan(true);
+
+        setActionBarIcon(R.drawable.ic_bulb);
+        mItems = new ArrayList<ParseObject>();
+
+        if (savedInstanceState == null) {
+            pendingIntroAnimation = true;
+        } else {
+
+            mAdapter.updateItems(false, 0);
+
+        }
+        mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+
+        getSampleData();
+        mAdapter = new LEDAdapter(this, mItems);
+        mAdapter.setOnFeedItemClickListener(MainActivity.this);
+        mRecyclerView.setAdapter(mAdapter);
+
+        mLayoutManager = new LinearLayoutManager(this);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+
+
+//        ble = new Ble(getApplicationContext(), this);
+//        ble.AddService("5faaf494-d4c6-483e-b592-d1a6ffd436c9", "5faaf495-d4c6-483e-b592-d1a6ffd436c9", "5faaf496-d4c6-483e-b592-d1a6ffd436c9");
+//        ble.scan(true);
+    }
+
+    @Override
+    protected int getLayoutResource() {
+        return R.layout.activity_main;
+    }
+
+
+    public List<ParseObject> getSampleData() {
+
+
+        // Query to see if user exists
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("LEDtest");
+        query.findInBackground( new FindCallback<ParseObject>() {
+
+            @Override
+            public void done(List<ParseObject> data, ParseException e) {
+
+                if(data != null){
+
+                    mItems.addAll(data);
+                   // mRecyclerView.setItemAnimator(new FadeInAnimator());
+
+                    mAdapter.notifyDataSetChanged();
+
+                    if(mItems != null){
+
+                        mAdapter.updateItems(true,0);
+                    }
+                }
+
+                else {
+
+
+                }
+            }
+        });
+
+
+        return  mItems;
     }
 
 
@@ -86,5 +167,25 @@ public class MainActivity extends ActionBarActivity implements BleListener {
         msg[2] = b;
 
         device.sendMessage(msg);
+    }
+
+    @Override
+    public void onColorClick(View v, int position) {
+
+        ColorSelector colorSelector = new ColorSelector(MainActivity.this, backgroundColor, MainActivity.this);
+        colorSelector.show();
+
+    }
+
+    @Override
+    public void onSettingsClick(View v, int position) {
+
+    }
+
+
+    @Override
+    public void onColorSelected(int color) {
+        backgroundColor = color;
+
     }
 }
