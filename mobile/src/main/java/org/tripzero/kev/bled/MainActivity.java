@@ -3,6 +3,8 @@ package org.tripzero.kev.bled;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -18,6 +20,7 @@ import com.parse.ParseQuery;
 
 import org.tripzero.kev.bled.adapters.LEDAdapter;
 import org.tripzero.kev.bled.utils.BaseActivity;
+import org.tripzero.kev.bled.utils.DimDialog;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -179,6 +182,11 @@ public class MainActivity extends BaseActivity implements ColorSelector.OnColorS
 
     @Override
     public void onSettingsClick(View v, int position) {
+        // Also send any additional data to Dialog fragment. ie Device ID
+        FragmentActivity activity = (FragmentActivity) (MainActivity.this);
+        FragmentManager fm = activity.getSupportFragmentManager();
+        DimDialog submitDialog = new DimDialog();
+        submitDialog.show(fm, "");
 
     }
 
