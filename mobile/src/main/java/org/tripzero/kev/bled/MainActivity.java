@@ -13,10 +13,6 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.gc.materialdesign.widgets.ColorSelector;
-import com.parse.FindCallback;
-import com.parse.ParseException;
-import com.parse.ParseObject;
-import com.parse.ParseQuery;
 
 import org.tripzero.kev.bled.adapters.LEDAdapter;
 import org.tripzero.kev.bled.utils.BaseActivity;
@@ -26,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class MainActivity extends BaseActivity implements ColorSelector.OnColorSelectedListener,BleListener,LEDAdapter.OnFeedItemClickListener {
+public class MainActivity extends BaseActivity implements ColorSelector.OnColorSelectedListener, BleListener, LEDAdapter.OnFeedItemClickListener {
 
     private Ble ble;
     public int backgroundColor = Color.parseColor("#039BE5");
@@ -34,7 +30,7 @@ public class MainActivity extends BaseActivity implements ColorSelector.OnColorS
     LEDAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private RecyclerView mRecyclerView;
-    private List<ParseObject> mItems;
+    //private List<ParseObject> mItems;
     private boolean pendingIntroAnimation;
 
 
@@ -74,7 +70,7 @@ public class MainActivity extends BaseActivity implements ColorSelector.OnColorS
     }
 
 
-    public List<ParseObject> getSampleData() {
+    /*public List<ParseObject> getSampleData() {
 
 
         // Query to see if user exists
@@ -106,7 +102,7 @@ public class MainActivity extends BaseActivity implements ColorSelector.OnColorS
 
 
         return  mItems;
-    }
+    }*/
 
 
     @Override
