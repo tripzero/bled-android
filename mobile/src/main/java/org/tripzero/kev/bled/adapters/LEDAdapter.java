@@ -12,8 +12,6 @@ import android.widget.ImageButton;
 import android.support.v7.widget.SwitchCompat;
 import android.widget.TextView;
 
-import com.parse.ParseObject;
-
 import org.tripzero.kev.bled.Ble;
 import org.tripzero.kev.bled.MainActivity;
 import org.tripzero.kev.bled.R;
@@ -85,14 +83,11 @@ public class LEDAdapter extends RecyclerView.Adapter<LEDAdapter.MyViewHolder> im
     public void onBindViewHolder(MyViewHolder holder, int position) {
         runEnterAnimation(holder.itemView, position);
         //InspireItems Inspire = mItems.get(position);
-        ParseObject Object = mItems.get(position);
-        holder.lightName.setText(Object.getString("lightName"));//.getiAuthor());
+        Ble.Device device = mItems.get(position);
+        holder.lightName.setText(device.name());//.getiAuthor());
 
         holder.colorSelector.setTag(position);
         holder.settings.setTag(holder);
-
-
-
     }
 
     @Override

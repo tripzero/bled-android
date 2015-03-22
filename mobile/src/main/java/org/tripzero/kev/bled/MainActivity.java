@@ -30,7 +30,6 @@ public class MainActivity extends BaseActivity implements ColorSelector.OnColorS
     LEDAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private RecyclerView mRecyclerView;
-    //private List<ParseObject> mItems;
     private boolean pendingIntroAnimation;
 
 
@@ -57,9 +56,9 @@ public class MainActivity extends BaseActivity implements ColorSelector.OnColorS
         mRecyclerView.setLayoutManager(mLayoutManager);
 
 
-//        ble = new Ble(getApplicationContext(), this);
-//        ble.AddService("5faaf494-d4c6-483e-b592-d1a6ffd436c9", "5faaf495-d4c6-483e-b592-d1a6ffd436c9", "5faaf496-d4c6-483e-b592-d1a6ffd436c9");
-//        ble.scan(true);
+        ble = new Ble(getApplicationContext(), this);
+        ble.AddService("5faaf494-d4c6-483e-b592-d1a6ffd436c9", "5faaf495-d4c6-483e-b592-d1a6ffd436c9", "5faaf496-d4c6-483e-b592-d1a6ffd436c9");
+        ble.scan(true);
     }
 
     @Override
@@ -153,15 +152,17 @@ public class MainActivity extends BaseActivity implements ColorSelector.OnColorS
         };
 
         devices.add(device);
+        mAdapter.updateItems(true, 0);
         device.connect();
     }
 
     private void setColor(Ble.Device device, byte r, byte g, byte b)
     {
-        byte[] msg = new byte[3];
-        msg[0] = r;
-        msg[1] = g;
-        msg[2] = b;
+        byte[] msg = new byte[4];
+        msg[0] = 'c';
+        msg[1] = r;
+        msg[2] = g;
+        msg[3] = b;
 
         device.sendMessage(msg);
     }
@@ -171,7 +172,6 @@ public class MainActivity extends BaseActivity implements ColorSelector.OnColorS
 
         ColorSelector colorSelector = new ColorSelector(MainActivity.this, backgroundColor, MainActivity.this);
         colorSelector.show();
-
     }
 
     @Override
@@ -181,13 +181,11 @@ public class MainActivity extends BaseActivity implements ColorSelector.OnColorS
         FragmentManager fm = activity.getSupportFragmentManager();
         DimDialog submitDialog = new DimDialog();
         submitDialog.show(fm, "");
-
     }
 
 
     @Override
     public void onColorSelected(int color) {
         backgroundColor = color;
-
     }
 }

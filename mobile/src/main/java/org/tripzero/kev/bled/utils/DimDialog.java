@@ -9,7 +9,6 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.gc.materialdesign.views.Slider;
-import com.parse.ParseObject;
 
 import org.tripzero.kev.bled.R;
 
