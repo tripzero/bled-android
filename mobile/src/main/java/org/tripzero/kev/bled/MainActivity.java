@@ -49,7 +49,7 @@ public class MainActivity extends BaseActivity implements ColorSelector.OnColorS
         }
         mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
 
-        mAdapter = new LEDAdapter(this, mItems);
+        mAdapter = new LEDAdapter(this, devices);
         mAdapter.setOnFeedItemClickListener(MainActivity.this);
         mRecyclerView.setAdapter(mAdapter);
 

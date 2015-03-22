@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.parse.ParseObject;
 
+import org.tripzero.kev.bled.Ble;
 import org.tripzero.kev.bled.MainActivity;
 import org.tripzero.kev.bled.R;
 import org.tripzero.kev.bled.utils.Utils;
@@ -35,14 +36,14 @@ public class LEDAdapter extends RecyclerView.Adapter<LEDAdapter.MyViewHolder> im
     int LEDcolor;
     private final LayoutInflater inflater;
     Context mContext;
-    List<ParseObject> mItems = Collections.emptyList();
+    List<Ble.Device> mItems = Collections.emptyList();
     private OnFeedItemClickListener onFeedItemClickListener;
 
 
 
-    public LEDAdapter(Context context, List<ParseObject> mItems) {
+    public LEDAdapter(Context context, List<Ble.Device> devices) {
         inflater = LayoutInflater.from(context);
-        this.mItems = mItems;
+        this.mItems = devices;
         this.mContext = context;
     }
 
