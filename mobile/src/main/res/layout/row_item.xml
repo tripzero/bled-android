@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+
+    <at.markushi.ui.CircleButton
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/led_view"
+        android:layout_width="65dp"
+        android:layout_height="65dp"
+        android:layout_marginLeft="4dp"
+        android:layout_alignParentLeft="true"
+        android:adjustViewBounds="true"
+        android:layout_centerVertical="true"
+        android:src="@drawable/ic_bulb"
+        app:cb_color="@color/primary"
+        app:cb_pressedRingWidth="8dip" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/light_name"
+        android:layout_marginLeft="16dp"
+        android:layout_toRightOf="@+id/led_view"
+        android:layout_centerVertical="true"
+        android:text="Living Room"
+        android:textSize="16dp"
+        android:layout_gravity="center_vertical"
+        android:textColor="@color/black"
+         />
+    <android.support.v7.widget.SwitchCompat
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_alignParentRight="true"
+        android:id="@+id/on_off_switch"
+
+        />
+
+    <ImageButton
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_centerVertical="true"
+        android:src="@drawable/ic_color"
+        android:background="@drawable/btn_feed_action"
+        android:layout_toLeftOf="@+id/settings"
+        android:adjustViewBounds="true"
+        android:id="@+id/color_selector" />
+
+    <ImageButton
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_centerVertical="true"
+        android:src="@drawable/ic_adjust"
+        android:layout_toLeftOf="@+id/on_off_switch"
+        android:background="@drawable/btn_feed_action"
+        android:adjustViewBounds="true"
+        android:id="@+id/settings" />
+
+
+
+
+
+</RelativeLayout>
