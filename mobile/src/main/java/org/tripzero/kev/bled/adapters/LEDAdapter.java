@@ -114,12 +114,6 @@ public class LEDAdapter extends RecyclerView.Adapter<LEDAdapter.MyViewHolder> im
         }
     }
 
-
-
-
-
-
-
     @Override
     public void onClick(View view) {
         final int viewId = view.getId();
@@ -140,8 +134,6 @@ public class LEDAdapter extends RecyclerView.Adapter<LEDAdapter.MyViewHolder> im
         }
     }
 
-
-
     public void updateItems(boolean animated, int position) {
 
         animateItems = animated;
@@ -153,12 +145,9 @@ public class LEDAdapter extends RecyclerView.Adapter<LEDAdapter.MyViewHolder> im
     }
 
     public interface OnFeedItemClickListener {
-        public void onColorClick(View v, int position);
+        void onColorClick(View v, int position);
 
-        public void onSettingsClick(View v, int position);
-
-
-
+        void onSettingsClick(View v, int position);
 
     }
 }

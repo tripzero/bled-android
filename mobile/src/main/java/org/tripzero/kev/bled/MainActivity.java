@@ -31,7 +31,7 @@ public class MainActivity extends BaseActivity implements ColorSelector.OnColorS
     private RecyclerView.LayoutManager mLayoutManager;
     private RecyclerView mRecyclerView;
     private boolean pendingIntroAnimation;
-
+    private Ble.Device selectedDevice;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,42 +65,6 @@ public class MainActivity extends BaseActivity implements ColorSelector.OnColorS
     protected int getLayoutResource() {
         return R.layout.activity_main;
     }
-
-
-    /*public List<ParseObject> getSampleData() {
-
-
-        // Query to see if user exists
-        ParseQuery<ParseObject> query = ParseQuery.getQuery("LEDtest");
-        query.findInBackground( new FindCallback<ParseObject>() {
-
-            @Override
-            public void done(List<ParseObject> data, ParseException e) {
-
-                if(data != null){
-
-                    mItems.addAll(data);
-                   // mRecyclerView.setItemAnimator(new FadeInAnimator());
-
-                    mAdapter.notifyDataSetChanged();
-
-                    if(mItems != null){
-
-                        mAdapter.updateItems(true,0);
-                    }
-                }
-
-                else {
-
-
-                }
-            }
-        });
-
-
-        return  mItems;
-    }*/
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -169,7 +133,7 @@ public class MainActivity extends BaseActivity implements ColorSelector.OnColorS
 
     @Override
     public void onColorClick(View v, int position) {
-
+        selectedDevice = devices.get(position);
         ColorSelector colorSelector = new ColorSelector(MainActivity.this, backgroundColor, MainActivity.this);
         colorSelector.show();
     }
@@ -187,5 +151,9 @@ public class MainActivity extends BaseActivity implements ColorSelector.OnColorS
     @Override
     public void onColorSelected(int color) {
         backgroundColor = color;
+        int r = (color >> 16) & 0xFF;
+        int g = (color >> 8) & 0xFF;
+        int b = (color >> 0) & 0xFF;
+        setColor(selectedDevice, (byte)r, (byte)g, (byte)b);
     }
 }
