@@ -8,7 +8,7 @@
 
     <com.gc.materialdesign.views.Slider
         android:id="@+id/slider"
-        android:layout_width="2`    50dp"
+        android:layout_width="50dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="25dp"

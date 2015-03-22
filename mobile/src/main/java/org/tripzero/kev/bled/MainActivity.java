@@ -39,7 +39,6 @@ public class MainActivity extends BaseActivity implements ColorSelector.OnColorS
         super.onCreate(savedInstanceState);
 
         setActionBarIcon(R.drawable.ic_bulb);
-        mItems = new ArrayList<ParseObject>();
 
         if (savedInstanceState == null) {
             pendingIntroAnimation = true;
@@ -50,7 +49,6 @@ public class MainActivity extends BaseActivity implements ColorSelector.OnColorS
         }
         mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
 
-        getSampleData();
         mAdapter = new LEDAdapter(this, mItems);
         mAdapter.setOnFeedItemClickListener(MainActivity.this);
         mRecyclerView.setAdapter(mAdapter);
