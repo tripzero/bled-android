@@ -1,13 +1,11 @@
 package org.tripzero.kev.bled;
 
-import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,14 +22,94 @@ import java.util.List;
 
 public class MainActivity extends BaseActivity implements ColorSelector.OnColorSelectedListener, BleListener, LEDAdapter.OnFeedItemClickListener {
 
+    public class LEDDevice {
+        public Ble.Device device;
+        public int red;
+        public int green;
+        public int blue;
+        public boolean mOn = false;
+
+        public LEDDevice(Ble.Device device)
+        {
+            this.device = device;
+        }
+
+        public void colorTest()
+        {
+            byte[] msg = new byte[1];
+            msg[0] = 'e';
+            device.sendMessage(msg);
+        }
+
+        public void fromRGB(int r, int g, int b)
+        {
+            red = r;
+            green = g;
+            blue = b;
+            postColors();
+        }
+
+        public int toInt()
+        {
+            if(mOn)
+            {
+                return Color.rgb(red, green, blue);
+            }
+            return Color.rgb(0, 0, 0);
+        }
+
+        public void fromInt(int color)
+        {
+            red = (color >> 16) & 0xFF;
+            green = (color >> 8) & 0xFF;
+            blue = (color >> 0) & 0xFF;
+
+            postColors();
+        }
+
+        public boolean isOn()
+        {
+            return mOn;
+        }
+
+        public void setOn(boolean o)
+        {
+            mOn = o;
+            byte[] msg = new byte[2];
+            msg[0] = 's';
+            msg[1] = mOn ? (byte)1 : (byte)0;
+
+            device.sendMessage(msg);
+        }
+
+        public void queryStatus()
+        {
+            byte[] msg = new byte[1];
+            msg[0] = '?';
+            device.sendMessage(msg);
+        }
+
+
+        private void postColors()
+        {
+            byte[] msg = new byte[4];
+            msg[0] = 'c';
+            msg[1] = (byte)red ;
+            msg[2] = (byte)green;
+            msg[3] = (byte)blue;
+
+            device.sendMessage(msg);
+        }
+
+    }
     private Ble ble;
     public int backgroundColor = Color.parseColor("#039BE5");
-    private List<Ble.Device> devices = new ArrayList<>();
+    private List<LEDDevice> devices = new ArrayList<>();
     LEDAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private RecyclerView mRecyclerView;
     private boolean pendingIntroAnimation;
-    private Ble.Device selectedDevice;
+    private LEDDevice selectedDevice;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,9 +120,7 @@ public class MainActivity extends BaseActivity implements ColorSelector.OnColorS
         if (savedInstanceState == null) {
             pendingIntroAnimation = true;
         } else {
-
-            mAdapter.updateItems(false, 0);
-
+//            mAdapter.updateItems(false, 0);
         }
         mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
 
@@ -91,17 +167,49 @@ public class MainActivity extends BaseActivity implements ColorSelector.OnColorS
     @Override
     public void onBleDeviceDiscovered(Ble.Device device) {
         final Ble.Device dev = device;
-        device.listener = new BleDeviceListener() {
+
+        final LEDDevice light = new LEDDevice(dev);
+        if(isUniqueDevice(dev))
+        {
+
+            devices.add(light);
+            mAdapter.updateItems(true, 0);
+        }
+
+        light.device.listener = new BleDeviceListener() {
             @Override
-            public void onBleMessage(String message) {
-                System.out.println("new message: " + message);
+            public void onBleMessage(byte[] message) {
+                for(int i = 0; i < message.length; i++) {
+                    byte c = message[i];
+                    if(c == 'c') {
+                        light.red = (int)message[++i];
+                        light.green = (int)message[++i];
+                        light.blue = (int)message[++i];
+                        System.out.println("color changed msg received");
+                        System.out.println(light.red);
+                        System.out.println(light.blue);
+                        System.out.println(light.green);
+                    }
+                    else if(c == 's')
+                    {
+                        light.mOn = (message[++i] != 0);
+                        System.out.println("Light status: " + String.valueOf(light.isOn()));
+                    }
+                }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mAdapter.updateItems(true, 0);
+                    }
+                });
             }
 
             @Override
             public void onReady() {
                 /// turn led to green:
                 System.out.println("We are ready!");
-                setColor(dev, (byte)0, (byte)100, (byte)0);
+                light.colorTest();
+                light.queryStatus();
             }
 
             @Override
@@ -115,20 +223,18 @@ public class MainActivity extends BaseActivity implements ColorSelector.OnColorS
             }
         };
 
-        devices.add(device);
-        mAdapter.updateItems(true, 0);
-        device.connect();
     }
 
-    private void setColor(Ble.Device device, byte r, byte g, byte b)
+    private boolean isUniqueDevice(Ble.Device device)
     {
-        byte[] msg = new byte[4];
-        msg[0] = 'c';
-        msg[1] = r;
-        msg[2] = g;
-        msg[3] = b;
-
-        device.sendMessage(msg);
+        for(LEDDevice dev : devices)
+        {
+            if(dev.device.address().equals(device.address()))
+            {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
@@ -147,13 +253,24 @@ public class MainActivity extends BaseActivity implements ColorSelector.OnColorS
         submitDialog.show(fm, "");
     }
 
+    @Override
+    public void onLedClicked(int position) {
+        System.out.println("clicked on the led.  connecting...");
+        selectedDevice = devices.get(position);
+        selectedDevice.device.connect();
+    }
+
+    @Override
+    public void onToggleOnClicked(int position, boolean on) {
+        selectedDevice = devices.get(position);
+        selectedDevice.setOn(on);
+    }
+
 
     @Override
     public void onColorSelected(int color) {
         backgroundColor = color;
-        int r = (color >> 16) & 0xFF;
-        int g = (color >> 8) & 0xFF;
-        int b = (color >> 0) & 0xFF;
-        setColor(selectedDevice, (byte)r, (byte)g, (byte)b);
+        selectedDevice.fromInt(color);
+        mAdapter.updateItems(true, 0);
     }
 }

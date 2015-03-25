@@ -2,12 +2,14 @@ package org.tripzero.kev.bled.adapters;
 
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
+import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.support.v7.widget.SwitchCompat;
 import android.widget.TextView;
@@ -17,9 +19,7 @@ import org.tripzero.kev.bled.MainActivity;
 import org.tripzero.kev.bled.R;
 import org.tripzero.kev.bled.utils.Utils;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import at.markushi.ui.CircleButton;
 
@@ -34,12 +34,10 @@ public class LEDAdapter extends RecyclerView.Adapter<LEDAdapter.MyViewHolder> im
     int LEDcolor;
     private final LayoutInflater inflater;
     Context mContext;
-    List<Ble.Device> mItems = Collections.emptyList();
+    List<MainActivity.LEDDevice> mItems = Collections.emptyList();
     private OnFeedItemClickListener onFeedItemClickListener;
 
-
-
-    public LEDAdapter(Context context, List<Ble.Device> devices) {
+    public LEDAdapter(Context context, List<MainActivity.LEDDevice> devices) {
         inflater = LayoutInflater.from(context);
         this.mItems = devices;
         this.mContext = context;
@@ -80,14 +78,36 @@ public class LEDAdapter extends RecyclerView.Adapter<LEDAdapter.MyViewHolder> im
     }
 
     @Override
-    public void onBindViewHolder(MyViewHolder holder, int position) {
+    public void onBindViewHolder(MyViewHolder holder, final int position) {
         runEnterAnimation(holder.itemView, position);
-        //InspireItems Inspire = mItems.get(position);
-        Ble.Device device = mItems.get(position);
-        holder.lightName.setText(device.name());//.getiAuthor());
+
+        MainActivity.LEDDevice device = mItems.get(position);
+        holder.lightName.setText(device.device.name());
 
         holder.colorSelector.setTag(position);
         holder.settings.setTag(holder);
+
+        holder.LEDcolorView.setClickable(true);
+        holder.LEDcolorView.setOnClickListener(new CircleButton.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                if (onFeedItemClickListener != null) {
+                    onFeedItemClickListener.onLedClicked(position);
+                }
+            }
+        });
+
+        holder.LEDcolorView.setColor(device.device.isValid() ? device.toInt() : Color.GRAY);
+
+        holder.onOff.setOnCheckedChangeListener(new SwitchCompat.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if (onFeedItemClickListener != null) {
+                    onFeedItemClickListener.onToggleOnClicked(position, b);
+                }
+            }
+        });
     }
 
     @Override
@@ -109,8 +129,6 @@ public class LEDAdapter extends RecyclerView.Adapter<LEDAdapter.MyViewHolder> im
             lightName = (TextView) itemView.findViewById(R.id.light_name);
             settings = (ImageButton) itemView.findViewById(R.id.settings);
             colorSelector = (ImageButton) itemView.findViewById(R.id.color_selector);
-
-
         }
     }
 
@@ -120,17 +138,14 @@ public class LEDAdapter extends RecyclerView.Adapter<LEDAdapter.MyViewHolder> im
         if (viewId == R.id.color_selector) {
             if (onFeedItemClickListener != null) {
                 onFeedItemClickListener.onColorClick(view, (Integer) view.getTag());
-
             }
-
         } else if (viewId == R.id.settings) {
             MyViewHolder holder = (MyViewHolder) view.getTag();
             if (onFeedItemClickListener != null) {
                 onFeedItemClickListener.onSettingsClick(view,holder.getPosition());
-
-
             }
-
+        } else {
+            System.out.println("Something was clicked, but I don't know what...");
         }
     }
 
@@ -149,5 +164,8 @@ public class LEDAdapter extends RecyclerView.Adapter<LEDAdapter.MyViewHolder> im
 
         void onSettingsClick(View v, int position);
 
+        void onLedClicked(int position);
+
+        void onToggleOnClicked(int position, boolean on);
     }
 }

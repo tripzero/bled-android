@@ -28,7 +28,7 @@ interface BleListener
 
 interface BleDeviceListener
 {
-    void onBleMessage(String message);
+    void onBleMessage(byte[] message);
     void onReady();
     void onBleConnect();
     void onBleDisconnect();
@@ -93,7 +93,7 @@ public class Ble {
             deviceGatt.writeCharacteristic(tx);
         }
 
-        public void setMessage(String message) {
+        public void setMessage(byte[] message) {
             if(listener != null)
                 listener.onBleMessage(message);
         }
@@ -109,11 +109,18 @@ public class Ble {
         private BluetoothGattCallback gattCallback = new BluetoothGattCallback() {
             @Override
             public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
+                System.out.println("characteristic changed!");
                 super.onCharacteristicChanged(gatt, characteristic);
 
-                String data = characteristic.getStringValue(0);
+                byte[] data = characteristic.getValue();
                 System.out.println("received from device: " + data);
                 setMessage(data);
+            }
+
+            @Override
+            public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status)
+            {
+                System.out.println("onCharacteristicRead...");
             }
 
             @Override
@@ -156,8 +163,31 @@ public class Ble {
                 rx = s.getCharacteristic(service.rxUuid);
                 tx = s.getCharacteristic(service.txUuid);
 
-                if (rx != null && !gatt.setCharacteristicNotification(rx, true)) {
+                tx.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
+
+                if(rx == null)
+                {
+                    System.out.println("Rx characteristic is null.");
+                    System.out.println("We are looking for: " + service.rxUuid.toString());
+                    System.out.println("Found: ");
+                    for(BluetoothGattCharacteristic characteristic : s.getCharacteristics())
+                    {
+                        System.out.println(characteristic.getUuid().toString());
+                    }
+                    return;
+                }
+                if (!gatt.setCharacteristicNotification(rx, true)) {
                     System.out.println("Couldn't set notifications for RX characteristic!");
+                }
+                else {
+                    System.out.println("successfully set notifications for RX characteristic!");
+                    List<BluetoothGattDescriptor> ds = rx.getDescriptors();
+                    for(BluetoothGattDescriptor d : ds)
+                    {
+                        System.out.println("rx descriptor uuid: " + d.getUuid().toString());
+                        d.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+                        gatt.writeDescriptor(d);
+                    }
                 }
 
                 listener.onReady();
@@ -242,8 +272,6 @@ public class Ble {
                     {
                         String myServiceUuid = service.serviceUuid.toString();
                         System.out.println("Checking if any of our services matches: " + myServiceUuid);
-                        System.out.println(myServiceUuid + " ==? " + foundUuid);
-                        System.out.println("lengths: " + myServiceUuid.length() + " vs. " + foundUuid.length());
                         if(myServiceUuid.equals(foundUuid))
                         {
                             System.out.println("Yes, it does!");
